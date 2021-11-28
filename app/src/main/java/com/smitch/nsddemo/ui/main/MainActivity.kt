@@ -1,7 +1,7 @@
 package com.smitch.nsddemo.ui.main
 
-import android.content.Context
 import android.os.Bundle
+import android.os.StrictMode
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -20,10 +20,13 @@ class MainActivity : AppCompatActivity(), ClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mainActivityBinding = DataBindingUtil. setContentView(context, R.layout.activity_main)
-       mainActivityBinding.scan = context
+        mainActivityBinding = DataBindingUtil.setContentView(context, R.layout.activity_main)
+        val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
+        StrictMode.setThreadPolicy(policy)
+        mainActivityBinding.scan = context
         setupViewModel()
-        mainViewModel.print()
+        mainViewModel.print("Success")
+        //  mainViewModel.registerService()
     }
 
     private fun setupViewModel() {
@@ -32,11 +35,26 @@ class MainActivity : AppCompatActivity(), ClickListener {
             .get(MainViewModel::class.java)
 
     }
-    override fun onClicked(view : View){
-         printToast("Scan clicked")
+
+    override fun onScanClicked(view: View) {
+        when (view.id) {
+            R.id.btnScan -> {
+                mainViewModel.discoverService()
+            }
+            R.id.btnPublish -> {
+                mainViewModel.registerService()
+            }
+        }
+
     }
 
-    private fun printToast(msg: String){
-        Toast.makeText(context,msg, Toast.LENGTH_SHORT).show()
+    fun printToast(msg: String) {
+        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+    }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mainViewModel.unregister()
     }
 }
