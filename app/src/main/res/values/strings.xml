@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SmitchNSDDemo</string>
+    <string name="app_name">Smitch NSD Demo</string>
     <string name="bt_scan">Scan</string>
     <string name="bt_publish">Publish</string>
     <string name="msg_publish_success">Successfully published</string>
