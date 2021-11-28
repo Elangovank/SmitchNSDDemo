@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.smitch.nsddemo.R
 import com.smitch.nsddemo.databinding.ActivityMainBinding
@@ -15,7 +16,11 @@ class MainActivity : AppCompatActivity(), ClickListener {
     private lateinit var viewModelFactory: MainViewModel.Factory
     private val context: MainActivity by lazy { this }
 
+    private var serviceList = arrayListOf<ServiceModel>()
+
     private lateinit var mainActivityBinding: ActivityMainBinding
+
+    lateinit var adapter: AvailableServiceAdapter
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,8 +30,7 @@ class MainActivity : AppCompatActivity(), ClickListener {
         StrictMode.setThreadPolicy(policy)
         mainActivityBinding.scan = context
         setupViewModel()
-        mainViewModel.print("Success")
-        //  mainViewModel.registerService()
+        setUpServiceListAdapter()
     }
 
     private fun setupViewModel() {
@@ -34,6 +38,22 @@ class MainActivity : AppCompatActivity(), ClickListener {
         mainViewModel = ViewModelProvider(context, viewModelFactory)
             .get(MainViewModel::class.java)
 
+
+
+        mainViewModel.serviceListData.observe(this, Observer {
+
+            it?.let {
+                serviceList.addAll(it as ArrayList<ServiceModel>)
+                adapter.notifyDataSetChanged()
+                mainViewModel.stopDiscovery()
+            }
+        })
+
+    }
+
+    private fun setUpServiceListAdapter() {
+        adapter = AvailableServiceAdapter(serviceList)
+        mainActivityBinding.rvAvailableServiceList.adapter = adapter
     }
 
     override fun onScanClicked(view: View) {
@@ -48,13 +68,10 @@ class MainActivity : AppCompatActivity(), ClickListener {
 
     }
 
-    fun printToast(msg: String) {
-        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
-    }
-
-
     override fun onDestroy() {
         super.onDestroy()
         mainViewModel.unregister()
     }
+
+
 }

@@ -2,4 +2,7 @@
     <string name="app_name">SmitchNSDDemo</string>
     <string name="bt_scan">Scan</string>
     <string name="bt_publish">Publish</string>
+    <string name="msg_publish_success">Successfully published</string>
+    <string name="msg_publish_failure">Failed to Publish Service</string>
+    <string name="msg_published_already">Already published</string>
 </resources>
