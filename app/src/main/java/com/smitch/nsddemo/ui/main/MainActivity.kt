@@ -3,7 +3,6 @@ package com.smitch.nsddemo.ui.main
 import android.os.Bundle
 import android.os.StrictMode
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -43,7 +42,7 @@ class MainActivity : AppCompatActivity(), ClickListener {
         mainViewModel.serviceListData.observe(this, Observer {
 
             it?.let {
-                serviceList.addAll(it as ArrayList<ServiceModel>)
+                serviceList.addAll(it as List<ServiceModel>)
                 adapter.notifyDataSetChanged()
                 mainViewModel.stopDiscovery()
             }
@@ -56,7 +55,7 @@ class MainActivity : AppCompatActivity(), ClickListener {
         mainActivityBinding.rvAvailableServiceList.adapter = adapter
     }
 
-    override fun onScanClicked(view: View) {
+    override fun onClicked(view: View) {
         when (view.id) {
             R.id.btnScan -> {
                 mainViewModel.discoverService()

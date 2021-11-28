@@ -5,4 +5,11 @@
     <string name="msg_publish_success">Successfully published</string>
     <string name="msg_publish_failure">Failed to Publish Service</string>
     <string name="msg_published_already">Already published</string>
+    <string name="msg_not_published">Please publish before scanning</string>
+
+
+    <string name="label_service_name">Service Name</string>
+    <string name="label_service_type">Service Type</string>
+    <string name="label_port">Port</string>
+    <string name="label_host">Ip Address</string>
 </resources>

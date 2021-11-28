@@ -17,7 +17,7 @@ class MainViewModel(protected val context: Context) : ViewModel(),
     NsdManager.RegistrationListener {
 
     private val SERVICE_NAME = "myLocalHost"
-    private val SERVICE_TYPE = "_http._tcp."
+    private val SERVICE_TYPE = "_http._tcp"
     private val SERVICE_PORT = 80
     private var mNsdManager: NsdManager? = null
 
@@ -27,10 +27,6 @@ class MainViewModel(protected val context: Context) : ViewModel(),
     var serviceListData = MutableLiveData<List<ServiceModel?>>()
 
     val list: ArrayList<ServiceModel> = arrayListOf()
-    fun print(msg: String) {
-        Log.e(msg, msg)
-    }
-
 
     override fun onCleared() {
         super.onCleared()
@@ -79,20 +75,22 @@ class MainViewModel(protected val context: Context) : ViewModel(),
     }
 
     fun discoverService() {
-        CoroutineScope(Dispatchers.IO).launch {
-            list.clear()
-            mNsdManager!!.discoverServices(
-                SERVICE_TYPE,
-                NsdManager.PROTOCOL_DNS_SD, discoverListener
-            )
+        if (isPublished) {
+            CoroutineScope(Dispatchers.IO).launch {
+                list.clear()
+                mNsdManager?.discoverServices(
+                    SERVICE_TYPE,
+                    NsdManager.PROTOCOL_DNS_SD, discoverListener
+                )
+            }
+            isDiscoveredStarted = true
+        } else {
+            display(context.getString(R.string.msg_not_published))
         }
-        isDiscoveredStarted = true
     }
 
     fun unregister() {
-        print(Thread.currentThread().name)
         viewModelScope.launch(Dispatchers.IO) {
-            print(Thread.currentThread().name)
             mNsdManager?.apply {
                 unregisterService(this@MainViewModel)
                 stopServiceDiscovery(discoverListener)
@@ -117,25 +115,20 @@ class MainViewModel(protected val context: Context) : ViewModel(),
 
         override fun onServiceFound(p0: NsdServiceInfo?) {
 
-            Log.e("onServiceFound ", p0?.serviceName ?: "")
-            Log.e("onServiceFound ", p0?.serviceType ?: "")
-            Log.e("onServiceFound ", p0?.host.toString() ?: "")
-            Log.e("onServiceFound ", p0?.port.toString() ?: "")
-
-
             viewModelScope.launch(Dispatchers.IO) {
                 mNsdManager!!.resolveService(p0, object : NsdManager.ResolveListener {
                     override fun onResolveFailed(p0: NsdServiceInfo?, p1: Int) {
                     }
 
                     override fun onServiceResolved(p0: NsdServiceInfo?) {
-                        if (SERVICE_TYPE.equals(p0?.serviceType)) {
+                        if ((p0?.serviceType ?: "").contains(SERVICE_TYPE)) {
                             list.add(
                                 ServiceModel(
                                     p0?.serviceName ?: "",
                                     p0?.serviceType ?: "",
-                                    p0?.host.toString() ?: "",
-                                    p0?.port.toString() ?: ""
+                                    p0?.port.toString(),
+                                    p0?.host.toString()
+
 
                                 )
                             )
