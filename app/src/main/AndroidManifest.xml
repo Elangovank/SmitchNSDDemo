@@ -12,6 +12,7 @@
         android:theme="@style/Theme.SmitchNSDDemo">
         <activity
             android:name=".ui.main.MainActivity"
+            android:screenOrientation="portrait"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
